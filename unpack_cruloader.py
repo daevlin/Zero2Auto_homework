@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+#Todo Figure out how to ROL 4 with Python to then be able to XOR 0xC5 and find the Pastebin URL with regexp in Python
+
 import malduck
 import sys
 
