@@ -373,7 +373,7 @@ After the memory area is allocated, we come across sometthing that looks a lot l
             iVar10 = iVar10 + 1;
         } while (iVar10 < iVar2);
     }
-    ```
+```
     
     EDI = size of encrypted data in hex 
     edi=00015400 (87040 bytes)
