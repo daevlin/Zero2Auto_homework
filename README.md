@@ -413,7 +413,6 @@ With that knowledge, we should be able to make a Python script to unpacked the f
 
 But we still wanna know what it does, since we can see in the decompiled code that there are a few other encrypted strings which have not been decrypted yet.
 
-
 If the let the decryption routine finish on the newly allocted memory region we can see a decrypted MZ binary. 
 
 ![decrypted_rsrc](decrypted_rsrc.png)
@@ -431,6 +430,8 @@ After the .rsrc has been decrypted, it goes back to resoöving some more encrypt
 ```
 
 It then calls this API to spawn a suspended copy of itself. This is starting to look like it will write the unpacked payload to a new process.
+
+![Spawn_child](spawned_child.png)
 
 **Cruloaders second layer**
 
