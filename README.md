@@ -27,7 +27,9 @@ Detections:
 Which is a indicator that the sample might be malicous
 
 Looking at the imports with rabin2 -i main_bin.exe we can see that the sample import the following API calls:
+
 ```
+
 [Imports]
 ordinal=001 plt=0x00000000 bind=NONE type=FUNC name=KERNEL32.dll_GetModuleFileNameA
 ordinal=002 plt=0x00000000 bind=NONE type=FUNC name=KERNEL32.dll_LoadLibraryA
@@ -96,16 +98,20 @@ ordinal=064 plt=0x00000000 bind=NONE type=FUNC name=KERNEL32.dll_SetFilePointerE
 ordinal=065 plt=0x00000000 bind=NONE type=FUNC name=KERNEL32.dll_CreateFileW
 ordinal=066 plt=0x00000000 bind=NONE type=FUNC name=KERNEL32.dll_CloseHandle
 ordinal=067 plt=0x00000000 bind=NONE type=FUNC name=KERNEL32.dll_DecodePointer
+
 ```
 
 Looking at the sections of the binary with the following command "rabin2 -S main_bin.exe" 
+
 ```
+
 [Sections]
 idx=00 addr=0x00000400 off=0x00000400 sz=50688 vsz=50335 perm=-r-x name=.text
 idx=01 addr=0x0000ca00 off=0x0000ca00 sz=23040 vsz=23002 perm=-r-- name=.rdata
 idx=02 addr=0x00012400 off=0x00012400 sz=2560 vsz=5028 perm=-rw- name=.data
 idx=03 addr=0x00012e00 off=0x00012e00 sz=87552 vsz=87168 perm=-r-- name=.rsrc
 idx=04 addr=0x00028400 off=0x00028400 sz=4096 vsz=3768 perm=-r-- name=.reloc
+
 ```
 What sticks out in this case is that the .rsrc section is quite big, but there are no calls to any API calls to access it, for example:
 
@@ -114,6 +120,7 @@ SizeofResource
 FindResourceA
 LockResource
 LoadResource 
+
 ```
 
 DIE does not indicate that the sample is packed with a known packer. But hiding API calls and the big .rsrc makes us have a theory that it is. We just have to prove it somehow.
@@ -193,9 +200,11 @@ void __fastcall fcn.00401300(char *param_1)
     fcn.0040163b((int32_t)param_1);
     return;
 }
+
 ```
 
 Before each call to GetProcAddress the fcn.00401300 is called. Let's assume that fcn.00401300 is our decryption function for now.
+
 ```c
 void __fastcall fcn.00401000(int32_t param_1)
 {
@@ -298,6 +307,7 @@ I have a sneaking suspicion that it is using ROT13 encoding.
 Our encrypted strings
 
 ```
+
 00000000  F5gG8e514pbag5kg
 00000014  .5ea5/QPY4//
 00000024  pe51g5Ceb35ffn
@@ -313,12 +323,15 @@ Our encrypted strings
 000000D0  I9egh1/n//b3
 000000E0  yb3.E5fbhe35
 000000F0  yb14E5fbhe35
+
 ```
 
 Our first encrypted strings
 
 ```
+
 .5ea5/QPY4//
+
 ```
 
 Imma gonna need a quantum computer to crack this!
@@ -326,7 +339,9 @@ Imma gonna need a quantum computer to crack this!
 If we take the . and rotate 13 chars according to the lookup table (abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890./=) we end up on k. If we take the second char "5" and rotate 13, we get e, then e becomes r and so on and so forth.
 
 ```
+
 .5ea5/QPY4// becomes kernel32.dll
+
 ```
 
 After the API calls to get the RC4 enrypted .rsrc section are deobfuscated it will call the following API calls
@@ -337,6 +352,7 @@ FindResourceA
 VirtualAlloc
 LockResource
 LoadResource
+
 ```
 
 If we set BP on LockResource, and let it hit (and return to user code), the address of the resource that it wans to read should be in the EAX register.
@@ -374,36 +390,36 @@ After the memory area is allocated, we come across sometthing that looks a lot l
         } while (iVar10 < iVar2);
     }
 ```
-    
-    EDI = size of encrypted data in hex 
-    edi=00015400 (87040 bytes)
+
+EDI = size of encrypted data in hex 
+edi=00015400 (87040 bytes)
 
 
 
-    If we look at this instruction we can see the RC4 key.
+If we look at this instruction we can see the RC4 key.
 
 00401592 | 0FB64438 0C              | movzx eax,byte ptr ds:[eax+edi+C]       | eax+edi*1+C:"kkd5YdPM24VBXmi"
 
-    EAX = 0 (start of our rsrc section)
-    EDI = start of our rsrc section at address 00416060 + C 
+EAX = 0 (start of our rsrc section)
+EDI = start of our rsrc section at address 00416060 + C 
     
-  We can validate this by starting up HxD to check the key and the data after it
+We can validate this by starting up HxD to check the key and the data after it
     
 ![HxD](resource_size.png)
 
+With that knowledge, we should be able to make a Python script to unpacked the first Stage of CruLoader.
+
+But we still wanna know what it does, since we can see in the decompiled code that there are a few other encrypted strings which have not been decrypted yet.
 
 
-    With that knowledge, we should be able to make a Python script to unpacked the first Stage of CruLoader.
+If the let the decryption routine finish on the newly allocted memory region we can see a decrypted MZ binary. 
 
-    But we still wanna know what it does, since we can see in the decompiled code that there are a few other encrypted strings which have not been decrypted yet.
+![decrypted_rsrc](decrypted_rsrc.png)
 
-
-    If the let the decryption routine finish on the newly allocted memory region we can see a decrypted MZ binary. 
-    <screenshot of decrypted binary>
-    So our RC4 is at offset C (12 bytes in)
+So our RC4 is at offset C (12 bytes in)
 
 
-    After the .rsrc has been decrypted, it goes back to resoloving some more encrypted API calls. The calls are the following:
+After the .rsrc has been decrypted, it goes back to resoloving some more encrypted API calls. The calls are the following:
 ```
 00000001  SetThreadContext
 00000025  CreateProcessA
