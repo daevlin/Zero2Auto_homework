@@ -742,11 +742,17 @@ Functionality for the final payload is to display a Messagebox
 
 
 
-Short summary report:
-
-Malware functionality:
+Short summary report
+The suspicous sample the IR team found on an infected machine has the following functionality:
+Spawns and injects itself into svhost.exe process to try and hide it's presence on the system
+Acts like a downloader and uses legitimate webservices like pastebin to get the next download stage to stay under the radar
+Hides additional downloaded payloads in a .PNG file, possibly to bypass FW/EDR/AV solutions.
+The final stage of the malicous code indicates the infected client has been "Uh Oh Hacked"
 
 Host based IOCs:
-
+Any svhost.exe processes with the wrong PPID which have been started without the -k switch
+The folder %TEMP%\\cruloader" with the file "output.jpg" in it
 
 Network based IOC:s
+https://pastebin.com/raw/mLem9DGk
+https://i.ibb.co/KsfqHym/PNG-02-Copy.png
