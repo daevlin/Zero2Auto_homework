@@ -203,7 +203,7 @@ void __fastcall fcn.00401300(char *param_1)
 ```
 
 Before each call to GetProcAddress the fcn.00401300 is called. Let's assume that fcn.00401300 is our decryption function for now.
-
+```c
 void __fastcall fcn.00401000(int32_t param_1)
 {
     undefined4 uVar1;
@@ -296,7 +296,7 @@ void __fastcall fcn.00401000(int32_t param_1)
     fcn.0040163b(unaff_EDI);
     return;
     }
-
+```
 
 Lets fire up x32dbg and put a BP 00401300, to further analyse it. Looking at this iVar6 = iVar3 + 0xd; (0xd = 13) I have a sneaking suspicion that it is using ROT13 encoding.
 
@@ -339,6 +339,7 @@ It will then call VirtualAlloc to assign a memory region for the resource.
 
 After the memory area is allocated, we come across sometthing that looks a lot like RC4 encryption (hint cmp eax, 100). But why is 102 pushed before that?
 
+```c
     iVar12 = 0;
     do {
         *(char *)((int32_t)&var_108h + iVar12) = (char)iVar12;
@@ -367,7 +368,8 @@ After the memory area is allocated, we come across sometthing that looks a lot l
             iVar10 = iVar10 + 1;
         } while (iVar10 < iVar2);
     }
-
+    ```    
+    
     EDI = size of encrypted data in hex 
     edi=00015400 (87040 bytes)
 
@@ -518,8 +520,7 @@ Googling on the constant "0xedb88320" indicates that it is used for CRC32 hashin
 
 There are 2 xrefs to this function at 0x00401660. We will look at the second use of it later.
 
-
-
+```c
 uint32_t __cdecl fcn.00401660(int32_t arg_8h)
 {
     uint8_t uVar1;
@@ -580,6 +581,7 @@ uint32_t __cdecl fcn.00401660(int32_t arg_8h)
     }
     return ~uVar4;
 }
+```
 
 Let's validate this somehow by firing up x32dbg.
 
