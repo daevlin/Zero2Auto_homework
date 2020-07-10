@@ -1,9 +1,5 @@
 # Zero2Hero_homework
 Data from analysis of the custom sample from the chapter "Practical Analysis and Test"
-Detailed analysis for Zero2hero malware sample.
-
-Todo: ROT13 decoder, RC4 decrypter for the .rsrc section. Decrypter for the URL, decrypter for the .png payload.
-
 
 Tools used. "rabin2, rahex2, Resource Hacker, DiE, Cutter, x32dbg, Python, Inetsim"
 
