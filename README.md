@@ -131,7 +131,7 @@ PE: linker: Microsoft Linker(14.25)[EXE32,console]
 
 7) Looking at the file in "Resource Hacker". There is a RCData resource with the ID 101. The .rsrc is kind of big, 86 KB to be exact and seems to contains random bytes, which may indicate it's packed or encrypted/obfuscated.
 
-![Resource Hacker]/resource_hacker.png
+![Resource Hacker](resource_hacker.png)
 
 8) Let's do some analysis of the suspicous binary in Cutter. What immediatly peaks my interest is what looks like a lookup table in the Strings pane in "Cutter" "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890./="
 
