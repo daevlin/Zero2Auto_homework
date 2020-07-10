@@ -132,16 +132,19 @@ Looking at the file in "Resource Hacker". There is a RCData resource with the ID
 
 ![Resource Hacker](resource_hacker.png)
 
-Let's do some analysis of the suspicous binary in Cutter. What immediatly peaks my interest is what looks like a lookup table in the Strings pane in "Cutter" "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890./="
+The .rsrc section also has quite a high entry, as shown by the diagram in DiE.
+
+![Detect It Easy](entropy_rsrc.png)
+
+Let's do some analysis of the suspicous binary in Cutter. What immediatly peaks my interest is what looks like a lookup table in the Strings pane in Cutter. "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890./="
 
 Looking a xrefs to the strings we come to this
 
-<Picture of what may be a decryption routine>
+![Cutter Xrefs string decryption](calls_to_decrypt.png)
 
-Decompiling the function looks like this:
+The decompiled the function looks like this in Cutter:
 
-
-
+```c
 void __fastcall fcn.00401300(char *param_1)
 {
     char cVar1;
@@ -197,10 +200,9 @@ void __fastcall fcn.00401300(char *param_1)
     fcn.0040163b((int32_t)param_1);
     return;
 }
-
+```
 
 Before each call to GetProcAddress the fcn.00401300 is called. Let's assume that fcn.00401300 is our decryption function for now.
-
 
 void __fastcall fcn.00401000(int32_t param_1)
 {
@@ -293,7 +295,8 @@ void __fastcall fcn.00401000(int32_t param_1)
     }
     fcn.0040163b(unaff_EDI);
     return;
-}
+    }
+
 
 Lets fire up x32dbg and put a BP 00401300, to further analyse it. Looking at this iVar6 = iVar3 + 0xd; (0xd = 13) I have a sneaking suspicion that it is using ROT13 encoding.
 
