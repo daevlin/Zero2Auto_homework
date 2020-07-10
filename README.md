@@ -391,7 +391,6 @@ After the memory area is allocated, we come across sometthing that looks a lot l
     
 ![HxD](resource_size.png)
 
-Decompiled it should look like this
 
 
     With that knowledge, we should be able to make a Python script to unpacked the first Stage of CruLoader.
@@ -404,7 +403,7 @@ Decompiled it should look like this
     So our RC4 is at offset C (12 bytes in)
 
 
-After the .rsrc has been decrypted, it goes back to resoloving some more encrypted API calls. The calls are the following:
+    After the .rsrc has been decrypted, it goes back to resoloving some more encrypted API calls. The calls are the following:
 ```
 00000001  SetThreadContext
 00000025  CreateProcessA
