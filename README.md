@@ -752,6 +752,22 @@ Acts like a downloader for additional malicous code
 Uses legitimate webservices like Pastebin to get the next download stage to stay under the radar
 Hides additional downloaded payloads in .PNG files, possibly to bypass FW/EDR/AV solutions
 The final stage of the malicous code indicates the infected client has been "Uh Oh Hacked"
+I've attached at the following Yara rule to this email, that the IR team can use to find use on the infected client(s)
+
+rule Zero_2_Hero_CruLoader
+{
+	meta:
+	    author="daevlin"
+	    description="Zero2hero CruLoader"
+	    reference="https://courses.zero2auto.com/"
+    strings:
+        $cruloader_pdb = "Cruloader_Payload.pdb" wide ascii
+        $cruloader_string = "cruloader" wide ascii
+
+
+    condition:
+        ($cruloader_pdb  or $cruloader_string)
+}
 
 Host based IOCs:
 Any svhost.exe processes with the wrong PPID which have been started without the -k switch
