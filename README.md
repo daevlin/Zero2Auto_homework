@@ -645,7 +645,6 @@ InternetReadFile
 InternetCloseHandle
 HttpQueryInfoA
 ```
-
 Hmmm. API calls to internet connectivity, but we don't see any URL/hostname in the binary. Where is it hiding?
 
 If we set a BP on InternetOpenUrlA we can see that URL "https://pastebin.com/raw/mLem9DGk"
@@ -675,6 +674,7 @@ http://pastebin.com/index.html
 
 
 The string output.jpg is encrypted with
+```
 rol cl,4  
 xor cl,1F
 
