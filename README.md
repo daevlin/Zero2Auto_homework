@@ -26,7 +26,7 @@ Detections:
 
 Which is a indicator that the sample might be malicous
 
-2) Looking at the imports with rabin2 -i main_bin.exe we can see that the sample import the following API calls:
+Looking at the imports with rabin2 -i main_bin.exe we can see that the sample import the following API calls:
 
 [Imports]
 ordinal=001 plt=0x00000000 bind=NONE type=FUNC name=KERNEL32.dll_GetModuleFileNameA
@@ -103,7 +103,7 @@ ordinal=067 plt=0x00000000 bind=NONE type=FUNC name=KERNEL32.dll_DecodePointer
 There are no exported functions
 0 exports
 
-3) Looking at the sections of the binary with the following command "rabin2 -S main_bin.exe" 
+Looking at the sections of the binary with the following command "rabin2 -S main_bin.exe" 
 
 
 [Sections]
@@ -122,18 +122,17 @@ LockResource
 LoadResource 
 
 
-4) DIE does not indicate that the sample is packed with a known packer. But hiding API calls and the big .rsrc makes us have a theory that it is. We just have to prove it somehow.
+DIE does not indicate that the sample is packed with a known packer. But hiding API calls and the big .rsrc makes us have a theory that it is. We just have to prove it somehow.
 diec main_bin.exe 
 PE: compiler: Microsoft Visual C/C++(-)[-]
 PE: linker: Microsoft Linker(14.25)[EXE32,console]
 
-6) I may use some anti debugging due to the API call to IsDebuggerPresent
 
-7) Looking at the file in "Resource Hacker". There is a RCData resource with the ID 101. The .rsrc is kind of big, 86 KB to be exact and seems to contains random bytes, which may indicate it's packed or encrypted/obfuscated.
+Looking at the file in "Resource Hacker". There is a RCData resource with the ID 101. The .rsrc is kind of big, 86 KB to be exact and seems to contains random bytes, which may indicate it's packed or encrypted/obfuscated.
 
 ![Resource Hacker](resource_hacker.png)
 
-8) Let's do some analysis of the suspicous binary in Cutter. What immediatly peaks my interest is what looks like a lookup table in the Strings pane in "Cutter" "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890./="
+Let's do some analysis of the suspicous binary in Cutter. What immediatly peaks my interest is what looks like a lookup table in the Strings pane in "Cutter" "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890./="
 
 Looking a xrefs to the strings we come to this
 
@@ -404,11 +403,11 @@ After the .rsrc has been decrypted, it goes back to resoloving some more encrypt
 
 It then calls this API to spawn a suspended copy of itself. This is starting to look like it will write the unpacked payload to a new process.
 
-Part 2
+Cruloaders second layer
 
 So. With that, let's looked at the unpacked/decrypted payload we dumped out earlier to see what it does.
 
-1) Imports of our unpacked payload does not look that suspicous
+Imports of our unpacked payload does not look that suspicous
 
 rabin2.exe -i unpacked_cruloader.exe
 
@@ -485,7 +484,7 @@ Num  Vaddr       Bind      Type Name
   69 0x0040f110    NONE    FUNC KERNEL32.dll_CreateFileW
   70 0x0040f114    NONE    FUNC KERNEL32.dll_DecodePointer
 
-2) What about the sections? Nope
+What about the sections? Nope
 
 rabin2.exe -S unpacked_cruloader.exe
 [Sections]
