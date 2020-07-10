@@ -96,12 +96,9 @@ ordinal=064 plt=0x00000000 bind=NONE type=FUNC name=KERNEL32.dll_SetFilePointerE
 ordinal=065 plt=0x00000000 bind=NONE type=FUNC name=KERNEL32.dll_CreateFileW
 ordinal=066 plt=0x00000000 bind=NONE type=FUNC name=KERNEL32.dll_CloseHandle
 ordinal=067 plt=0x00000000 bind=NONE type=FUNC name=KERNEL32.dll_DecodePointer
-
-67 imports
 ```
 
 Looking at the sections of the binary with the following command "rabin2 -S main_bin.exe" 
-
 ```
 [Sections]
 idx=00 addr=0x00000400 off=0x00000400 sz=50688 vsz=50335 perm=-r-x name=.text
@@ -109,10 +106,9 @@ idx=01 addr=0x0000ca00 off=0x0000ca00 sz=23040 vsz=23002 perm=-r-- name=.rdata
 idx=02 addr=0x00012400 off=0x00012400 sz=2560 vsz=5028 perm=-rw- name=.data
 idx=03 addr=0x00012e00 off=0x00012e00 sz=87552 vsz=87168 perm=-r-- name=.rsrc
 idx=04 addr=0x00028400 off=0x00028400 sz=4096 vsz=3768 perm=-r-- name=.reloc
-
-5 sections
 ```
 What sticks out in this case is that the .rsrc section is quite big, but there are no calls to any API calls to access it, for example:
+
 ```
 SizeofResource
 FindResourceA
@@ -124,7 +120,6 @@ DIE does not indicate that the sample is packed with a known packer. But hiding 
 diec main_bin.exe 
 PE: compiler: Microsoft Visual C/C++(-)[-]
 PE: linker: Microsoft Linker(14.25)[EXE32,console]
-
 
 Looking at the file in "Resource Hacker". There is a RCData resource with the ID 101. The .rsrc is kind of big, 86 KB to be exact and seems to contains random bytes, which may indicate it's packed or encrypted/obfuscated.
 
@@ -301,6 +296,7 @@ Looking at this iVar6 = iVar3 + 0xd; (0xd = 13)
 I have a sneaking suspicion that it is using ROT13 encoding.
 
 Our encrypted strings
+
 ```
 00000000  F5gG8e514pbag5kg
 00000014  .5ea5/QPY4//
@@ -318,17 +314,23 @@ Our encrypted strings
 000000E0  yb3.E5fbhe35
 000000F0  yb14E5fbhe35
 ```
+
 Our first encrypted strings
+
 ```
 .5ea5/QPY4//
 ```
+
 Imma gonna need a quantum computer to crack this!
 
 If we take the . and rotate 13 chars according to the lookup table (abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890./=) we end up on k. If we take the second char "5" and rotate 13, we get e, then e becomes r and so on and so forth.
+
 ```
 .5ea5/QPY4// becomes kernel32.dll
 ```
+
 After the API calls to get the RC4 enrypted .rsrc section are deobfuscated it will call the following API calls
+
 ```
 SizeofResource
 FindResourceA
@@ -336,6 +338,7 @@ VirtualAlloc
 LockResource
 LoadResource
 ```
+
 If we set BP on LockResource, and let it hit (and return to user code), the address of the resource that it wans to read should be in the EAX register.
 It will then call VirtualAlloc to assign a memory region for the resource.
 
@@ -370,12 +373,12 @@ After the memory area is allocated, we come across sometthing that looks a lot l
             iVar10 = iVar10 + 1;
         } while (iVar10 < iVar2);
     }
-    ```    
+    ```
     
     EDI = size of encrypted data in hex 
     edi=00015400 (87040 bytes)
 
-    <screenshot from HxD>
+![HxD](resource_size.png)
 
     If we look at this instruction we can see the RC4 key.
 
@@ -408,6 +411,7 @@ After the .rsrc has been decrypted, it goes back to resoloving some more encrypt
 00000079  ReadProcessMemory
 0000008D  GetThreadContext
 ```
+
 It then calls this API to spawn a suspended copy of itself. This is starting to look like it will write the unpacked payload to a new process.
 
 Cruloaders second layer
@@ -417,6 +421,7 @@ So. With that, let's looked at the unpacked/decrypted payload we dumped out earl
 Imports of our unpacked payload does not look that suspicous
 
 rabin2.exe -i unpacked_cruloader.exe
+
 ```
 [Imports]
 Num  Vaddr       Bind      Type Name
@@ -491,6 +496,7 @@ Num  Vaddr       Bind      Type Name
   69 0x0040f110    NONE    FUNC KERNEL32.dll_CreateFileW
   70 0x0040f114    NONE    FUNC KERNEL32.dll_DecodePointer
 ```
+
 What about the sections? Nope
 
 rabin2.exe -S unpacked_cruloader.exe
