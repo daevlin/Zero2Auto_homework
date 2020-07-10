@@ -134,7 +134,7 @@ PE: linker: Microsoft Linker(14.25)[EXE32,console]
 <picture from Resource Hacker>
 
 
-8) Let's do some analysis of the suspicous binary in Cutter. What immediatly peaks my interest is what looks like a lookup table in the Strings pane  in Cutter "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890./="
+8) Let's do some analysis of the suspicous binary in Cutter. What immediatly peaks my interest is what looks like a lookup table in the Strings pane in "Cutter" "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890./="
 
 Looking a xrefs to the strings we come to this
 
@@ -702,10 +702,11 @@ Functionality for the final payload is to display a Messagebox:
 <insert Cutter .png with dissembly graph>
 
 
-Short report:
+Short summary report:
 
 Malware functionality:
 
 Host based IOCs:
+
 
 Network based IOC:s
