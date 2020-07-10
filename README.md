@@ -742,7 +742,7 @@ Functionality for the final payload is to display a Messagebox
 
 
 ```
-Short summary report
+Short summary report for the IR Team
 The suspicous sample the IR team found on an infected machine has the following functionality:
 Spawns and injects itself into svhost.exe process to try and hide it's presence on the system
 Acts like a downloader and uses legitimate webservices like pastebin to get the next download stage to stay under the radar
