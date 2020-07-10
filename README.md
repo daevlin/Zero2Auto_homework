@@ -741,7 +741,7 @@ Functionality for the final payload is to display a Messagebox
 ![Final_payload](final_payload_function.png)
 
 
-
+```
 Short summary report
 The suspicous sample the IR team found on an infected machine has the following functionality:
 Spawns and injects itself into svhost.exe process to try and hide it's presence on the system
@@ -756,3 +756,4 @@ The folder %TEMP%\\cruloader" with the file "output.jpg" in it
 Network based IOC:s
 https://pastebin.com/raw/mLem9DGk
 https://i.ibb.co/KsfqHym/PNG-02-Copy.png
+```
