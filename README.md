@@ -1,5 +1,6 @@
 # Zero2Hero_homework
 
+
 ```
 Short summary report for the IR Team
 
@@ -34,6 +35,10 @@ Network based IOC:s
 https://pastebin.com/raw/mLem9DGk
 https://i.ibb.co/KsfqHym/PNG-02-Copy.png
 ```
+
+
+
+
 
 
 ### Detailed analysis of the custom sample from the chapter "Practical Analysis and Test
