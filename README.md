@@ -36,7 +36,7 @@ https://i.ibb.co/KsfqHym/PNG-02-Copy.png
 ```
 
 
-Details for analysis of the custom sample from the chapter "Practical Analysis and Test"
+### Detailed analysis of the custom sample from the chapter "Practical Analysis and Test
 
 Tools used. "rabin2, rahex2, Resource Hacker, DiE, Cutter, x32dbg, Python, Inetsim"
 
