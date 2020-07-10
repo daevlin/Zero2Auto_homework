@@ -418,7 +418,7 @@ If the let the decryption routine finish on the newly allocted memory region we 
 
 ![decrypted_rsrc](decrypted_rsrc.png)
 
-After the .rsrc has been decrypted, it goes back to resoloving some more encrypted API calls. The calls are the following:
+After the .rsrc has been decrypted, it goes back to resoöving some more encrypted API calls. The calls are the following:
 ```
 00000001  SetThreadContext
 00000025  CreateProcessA
@@ -432,7 +432,7 @@ After the .rsrc has been decrypted, it goes back to resoloving some more encrypt
 
 It then calls this API to spawn a suspended copy of itself. This is starting to look like it will write the unpacked payload to a new process.
 
-Cruloaders second layer
+**Cruloaders second layer**
 
 So. With that, let's looked at the unpacked/decrypted payload we dumped out earlier to see what it does.
 
@@ -729,6 +729,8 @@ xor cl,9A
 After that strings is decrypted it checks for "IHDR" in the memory region allocated for the downloaded .png file and "redaolurc"
 
 If we look at the data after the "redaolurc" it seems to indicate that it's been XORED with 0x61 (the char "a")
+
+![redaolurc](redaolurc_EOF.png)
 
 De-XORing with 0x61 reveals that it's a Windows binary. We can trim the file by removing everything before the MZ header and resize the file with PE-bear.
 
