@@ -301,7 +301,7 @@ void __fastcall fcn.00401000(int32_t param_1)
 Lets fire up x32dbg and put a BP 00401300, to further analyse it. Looking at this iVar6 = iVar3 + 0xd; (0xd = 13) I have a sneaking suspicion that it is using ROT13 encoding.
 
 Our encrypted strings
-
+```
 00000000  F5gG8e514pbag5kg
 00000014  .5ea5/QPY4//
 00000024  pe51g5Ceb35ffn
@@ -317,7 +317,7 @@ Our encrypted strings
 000000D0  I9egh1/n//b3
 000000E0  yb3.E5fbhe35
 000000F0  yb14E5fbhe35
-
+```
 Our first encrypted strings
 .5ea5/QPY4//
 
