@@ -407,6 +407,8 @@ We can validate this by starting up HxD to check the key and the data after it
     
 ![HxD](resource_size.png)
 
+Our RC4 key is at offset C (12 bytes in)
+
 With that knowledge, we should be able to make a Python script to unpacked the first Stage of CruLoader.
 
 But we still wanna know what it does, since we can see in the decompiled code that there are a few other encrypted strings which have not been decrypted yet.
@@ -415,9 +417,6 @@ But we still wanna know what it does, since we can see in the decompiled code th
 If the let the decryption routine finish on the newly allocted memory region we can see a decrypted MZ binary. 
 
 ![decrypted_rsrc](decrypted_rsrc.png)
-
-So our RC4 is at offset C (12 bytes in)
-
 
 After the .rsrc has been decrypted, it goes back to resoloving some more encrypted API calls. The calls are the following:
 ```
@@ -653,23 +652,28 @@ One of the strings in the second stage are encrypted with
 rol dl,4
 xor dl,A2                               |
 ```
-The string (hex) 
+The string (hex)
+```
+
 1E 89 EF 5F BC CC 6C DC 5D 1D EF 1F BD 1D 6D 7C FC 19 09 EF 1D 4D 1C AC DC 1D 6D C8 7C AD 7C 00 86 12 40
 
+```
 Becomes
 C:\Windows\System32\svchost.exe
 
 It creates a RemoteThread in the suspended svchost.exe process at address 00101DC0 in my case, where it will continue execution in the spawned child process
 
-
 In the spawned svchost it once again uses CRC32 hashing to resolve API calls from wininet.dll
+
 ```
 InternetOpenA
 InternetOpenUrlA
 InternetReadFile
 InternetCloseHandle
 HttpQueryInfoA
+
 ```
+
 Hmmm. API calls to internet connectivity, but we don't see any URL/hostname in the binary. Where is it hiding?
 
 If we set a BP on InternetOpenUrlA we can see that URL "https://pastebin.com/raw/mLem9DGk"
@@ -695,17 +699,18 @@ cp PNG-02-Copy.png /var/lib/inetsim/http/fakefiles/sample.png
 
 I also was a bit cheeky and changed the pastebin URL in the sample to
 http://pastebin.com/index.html 
-<insert URL change screenshot>
 
+![Sneaky sneaky](sneaky_change_url.png)
 
-The string output.jpg is encrypted with
+The next string output.jpg is encrypted with
 ```
 rol cl,4  
 xor cl,1F
-
+```
 Which is the filename, of the payload (in the PNG file) that will be written to disk
 
 Once the .png file is downloaded it will once again call the CRC32 API hashing function and resolve:
+
 ```
 GetTempPathW
 CreateDirectoryW
@@ -720,6 +725,7 @@ THe string "redaolurc" is encrypted with:
 rol cl,4
 xor cl,9A
 ```
+
 After that strings is decrypted it checks for "IHDR" in the memory region allocated for the downloaded .png file and "redaolurc"
 
 If we look at the data after the "redaolurc" it seems to indicate that it's been XORED with 0x61 (the char "a")
@@ -731,8 +737,9 @@ Continuing exectution it spawns a new svchost.exe process in which it injects th
 The final payload contains an interesting string in form of PDB path, which we could build a YARA rule for.
 "C":\Users\User\source\repos\Cruloader_Payload\Release\Cruloader_Payload.pdb"
 
-Functionality for the final payload is to display a Messagebox:
-<insert Cutter .png with dissembly graph>
+Functionality for the final payload is to display a Messagebox
+![Final_payload](final_payload_function.png)
+
 
 
 Short summary report:
