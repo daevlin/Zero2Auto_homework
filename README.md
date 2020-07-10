@@ -378,7 +378,7 @@ After the memory area is allocated, we come across sometthing that looks a lot l
     EDI = size of encrypted data in hex 
     edi=00015400 (87040 bytes)
 
-![HxD](resource_size.png)
+
 
     If we look at this instruction we can see the RC4 key.
 
@@ -386,6 +386,10 @@ After the memory area is allocated, we come across sometthing that looks a lot l
 
     EAX = 0 (start of our rsrc section)
     EDI = start of our rsrc section at address 00416060 + C 
+    
+  We can validate this by starting up HxD to check the key and the data after it
+    
+![HxD](resource_size.png)
 
 Decompiled it should look like this
 
