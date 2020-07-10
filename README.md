@@ -740,13 +740,14 @@ The final payload contains an interesting string in form of PDB path, which we c
 Functionality for the final payload is to display a Messagebox
 ![Final_payload](final_payload_function.png)
 
-
+```
 Short summary report for the IR Team
 
 The suspicous sample the IR team found on an infected machine has the following functionality:
 Spawns and injects itself into svhost.exe process to try and hide it's presence on the system
-Acts like a downloader and uses legitimate webservices like pastebin to get the next download stage to stay under the radar
-Hides additional downloaded payloads in a .PNG file, possibly to bypass FW/EDR/AV solutions
+Acts like a downloader for additional malicous code
+Uses legitimate webservices like Pastebin to get the next download stage to stay under the radar
+Hides additional downloaded payloads in .PNG files, possibly to bypass FW/EDR/AV solutions
 The final stage of the malicous code indicates the infected client has been "Uh Oh Hacked"
 
 Host based IOCs:
