@@ -784,3 +784,12 @@ The final payload contains an interesting string in form of PDB path, which we c
 
 Functionality for the final payload is to display a Messagebox
 ![Final_payload](final_payload_function.png)
+
+**To automate parts of the extraction of the first packed layer and download of the .png payload I have created the following Python scripts:**
+Note that I am quite the beginner at Python coding, so the code may not be the best. :)
+The following scripts are available in this GitHub repository:
+```
+Unpack the first RC4 encrypted layer of CruLoader -- unpack_cruloader.py
+Get the .png payload and De-XOR it -- download_cruloader_payload.py
+Check for a Windows binary in the CruLoader .png in case the 1 byte XOR changes -- check_xor_png_cruloader.py
+```
