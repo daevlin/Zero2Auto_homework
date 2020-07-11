@@ -732,13 +732,13 @@ rol dl,4
 xor dl,C5
 ```
 
-We can verify this with the following "Cyberchef" recipe:
+We can verify this by dragging the unpacked CruLoader into Cyberchef and use with the recipe:
 ```
 Encoded URL in hex: DA 1B 1B 5B 6B FF AE AE 5B 4A 6B 1B 0A 7A CA BA BE 6A AA 8A AE 7B 4A 2B AE 8A 98 0A 8A CF 18 28 EA
 
-From_Hex('Space')
 Rotate_left(4,false)
 XOR({'option':'Hex','string':'C5'},'Standard',false)
+Extract_URLs(false)
 ```
 
 On that page is the following data
