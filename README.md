@@ -684,7 +684,8 @@ Whelps! What will it do with this information? Find a process to inject into? Be
 
 WTH? The process exited after it had gone through all the running processes. That's just evil. So how do we find out which process it is looking for?
 
-Killing ProcessHacker seems to do the trick. Then CreateProcessInternalW gets hit and a suspended svchost.exe process gets created:
+Killing ProcessHacker seems to do the trick. It also seems to check for Wireshark and possibly some other running process.
+Now that the bp for CreateProcessInternalW gets hit and a suspended svchost.exe process gets created:
 
 dword ptr [ebp+C]=[0018F9F4 &"C:\\Windows\\System32\\svchost.exe"]=0018FAA0 "C:\\Windows\\System32\\svchost.exe"
 
@@ -703,6 +704,7 @@ The string (hex)
 ```
 Becomes
 C:\Windows\System32\svchost.exe
+This explains why it got injected into "svchost.exe"
 
 It creates a RemoteThread in the suspended svchost.exe process at address 00101DC0 in my case, where it will continue execution in the spawned child process
 
@@ -725,6 +727,15 @@ The URL is encoded with:
 ```
 rol dl,4  
 xor dl,C5
+```
+
+We can verify this with the following "Cyberchef" recipe:
+```
+Encoded URL in hex: DA 1B 1B 5B 6B FF AE AE 5B 4A 6B 1B 0A 7A CA BA BE 6A AA 8A AE 7B 4A 2B AE 8A 98 0A 8A CF 18 28 EA
+
+From_Hex('Space')
+Rotate_left(4,false)
+XOR({'option':'Hex','string':'C5'},'Standard',false)
 ```
 
 On that page is the following data
