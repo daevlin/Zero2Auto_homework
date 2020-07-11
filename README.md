@@ -680,7 +680,7 @@ dword ptr [ebp-C]=[0018F884]=BC6B67BF
 
 rahash2.exe -a crc32 -s "Process32NextW"
 0x00000000-0x0000000d crc32: bc6b67bf
-
+```
 Whelps! What will it do with this information? Find a process to inject into? Be mean to us analysts and mess with us if a "forbidden" process is found?
 
 WTH? The process exited after it had gone through all the running processes. That's just evil. So how do we find out which process it is looking for?
