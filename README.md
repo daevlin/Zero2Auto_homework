@@ -654,8 +654,9 @@ uint32_t __cdecl fcn.00401660(int32_t arg_8h)
 ```
 
 Let's validate this somehow by firing up x32dbg.
-
+```
 x32dbg hash found:
+
 dword ptr [ebp-C]=[0018FAE4]=8436F795
 
 rahash2.exe -a crc32 -s "IsDebuggerPresent"
