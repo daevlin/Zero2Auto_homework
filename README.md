@@ -786,7 +786,7 @@ Functionality for the final payload is to display a Messagebox
 ![Final_payload](final_payload_function.png)
 
 **To automate parts of the extraction of the first packed layer and download of the .png payload I have created the following Python scripts:**
-Note that I am quite the beginner at Python coding, so the code may not be the best. :)
+(Note that I am quite the beginner at Python coding, so the code may not be the best)
 ```
 The following scripts are available in this GitHub repository:
 Unpack the first RC4 encrypted layer of CruLoader -- unpack_cruloader.py
