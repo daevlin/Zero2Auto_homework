@@ -12,7 +12,7 @@ outfile = infile + "_decrypted"
 
 p = malduck.pe(open(infile, "rb").read(), fast_load=False)
 get_rsrc = p.resource(101)
-rc4_key = get_rsrc[12:27]
+rc4_key = get_rsrc[12:12+15]
 encrypted = get_rsrc[28:]
 decrypted = malduck.rc4(rc4_key, encrypted)
 
