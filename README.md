@@ -34,6 +34,8 @@ The existance of the folder %TEMP%\\cruloader" with the file "output.jpg"
 Network based IOC:s
 https://pastebin.com/raw/mLem9DGk
 https://i.ibb.co/KsfqHym/PNG-02-Copy.png
+Browser User-Agent: cruloader
+
 ```
 
 
