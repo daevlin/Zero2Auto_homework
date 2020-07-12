@@ -686,6 +686,7 @@ rahash2.exe -a crc32 -s "Process32NextW"
 Whelps! What will it do with this information? Find a process to inject into? Be mean to us analysts and mess with us if a "forbidden" process is found?
 
 WTH? The process exited after it had gone through all the running processes. That's just evil. So how do we find out which process it is looking for?
+It looks like it uses the CRC32 function we saw before against any running processes.
 
 Killing ProcessHacker seems to do the trick. It also seems to check for Wireshark and possibly some other running process.
 Now that the bp for CreateProcessInternalW gets hit and a suspended svchost.exe process gets created:
