@@ -13,7 +13,7 @@ url_regexp = re.compile(r'http[s]?:\/\/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:
 png_stego_xor = 0x61
 url_xor = 0xC5
 #test_url_for_regexp = "https://pastebin.com/raw/mLem9DGk"
-
+s = bytes('', 'latin1')
 #Change the User-Agent to look less suspicius
 headers = {
     'User-Agent': 'cruloader'
@@ -43,7 +43,12 @@ else:
 		#convert back to bytes for malduck.xor
 		b = bytes(chr(a), 'latin1')
 		dexor = malduck.xor(0xC5, b)
-#		print(dexor)
+		s += dexor
+
+rolxor_data = (s.decode('latin-1'))
+
+# Iterate throught the data to find any regexp matches
+get_urls = url_regexp.finditer(rolxor_data)
 
 # Iterate throught the data to find any regexp matches
 get_urls = url_regexp.finditer(dexor)
