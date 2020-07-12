@@ -7,7 +7,6 @@ import re
 import requests
 
 infile = sys.argv[1]
-outfile = infile + "_decrypted"
 url_regexp = re.compile(r'\b(http|https)+://+((xn--)?[a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}b', re.I)
 
 # RC4 key offset at 0xC
@@ -62,6 +61,6 @@ decrypted = malduck.xor(key, payload)
 
 # Todo trim de-XOR:ed MZ file. For now I am piping the download payload througth "cut-bytes.py '[4D5A90]':" from Didier Stevens.
 
-# Write payload to disk
+# Write final stego .png payload to disk
 with open ("final_payload.bin", 'wb') as o:
 	o.write(decrypted)
