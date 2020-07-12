@@ -12,6 +12,7 @@ infile = sys.argv[1]
 url_regexp = re.compile(r'\bhttp[s]?:\/\/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+\b')
 png_stego_xor = 0x61
 url_xor = 0xC5
+#test_url_for_regexp = "https://pastebin.com/raw/mLem9DGk"
 
 #Change the User-Agent to look less suspicius
 headers = {
