@@ -8,7 +8,8 @@ import re
 import requests
 
 infile = sys.argv[1]
-url_regexp = re.compile(r'\b(http|https)+://+((xn--)?[a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}b', re.I)
+#URL regexp from https://www.w3resource.com/python-exercises/re/python-re-exercise-42.php
+url_regexp = re.compile(r'\bhttp[s]?:\/\/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+\b', re.I)
 png_stego_xor = 0x61
 url_xor = 0xC5
 
