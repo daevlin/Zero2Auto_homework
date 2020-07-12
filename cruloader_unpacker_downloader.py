@@ -9,7 +9,7 @@ import requests
 
 infile = sys.argv[1]
 # URL regexp from https://www.w3resource.com/python-exercises/re/python-re-exercise-42.php
-url_regexp = re.compile(r'\bhttp[s]?:\/\/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+\b')
+url_regexp = re.compile(r'http[s]?:\/\/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+')
 png_stego_xor = 0x61
 url_xor = 0xC5
 #test_url_for_regexp = "https://pastebin.com/raw/mLem9DGk"
