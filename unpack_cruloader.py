@@ -21,5 +21,8 @@ rc4_key = get_rsrc[key_offset:key_offset+key_size]
 encrypted = get_rsrc[28:]
 decrypted = malduck.rc4(rc4_key, encrypted)
 
-with open (outfile, 'wb') as o:
-	o.write(decrypted)
+if decrypted[0:2].decode('latin1') != "MZ":
+	print("RC4 decryption failed")	
+else:
+	with open (outfile, 'wb') as o:
+		o.write(decrypted)
