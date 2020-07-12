@@ -22,18 +22,21 @@ get_rsrc = p.resource(101)
 rc4_key = get_rsrc[key_offset:key_offset+key_size]
 encrypted = get_rsrc[28:]
 decrypted = malduck.rc4(rc4_key, encrypted)
-convert_rol = (decrypted[0:2])
 
+convert_rol = (decrypted)
+
+# Seems malduck ROL needs data type int according to the documentation
 for index,value in enumerate(convert_rol):
 	 a = malduck.rol(value, 4, bits=8)
 	 
 #dexor = malduck.xor(0x61, a)
 #print(dexor)
 
-#get_urls = url_regexp.finditer(decrypted)
+# Iterate throught the data to find any regexp matches
+get_urls = url_regexp.finditer(decrypted)
 
-#for matched_value in get_urls:
-#	matched_url = (matched_value.group())
+for matched_value in get_urls:
+	matched_url = (matched_value.group())
 
 #URL found in CruLoader sample
 url = matched_url
