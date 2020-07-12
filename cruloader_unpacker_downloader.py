@@ -46,12 +46,9 @@ else:
 		s += dexor
 
 rolxor_data = (s.decode('latin-1'))
-
+		
 # Iterate throught the data to find any regexp matches
 get_urls = url_regexp.finditer(rolxor_data)
-
-# Iterate throught the data to find any regexp matches
-get_urls = url_regexp.finditer(dexor)
 
 for matched_value in get_urls:
 	matched_url = (matched_value.group())
