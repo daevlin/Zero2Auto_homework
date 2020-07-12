@@ -13,6 +13,11 @@ url_regexp = re.compile(r'\bhttp[s]?:\/\/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(
 png_stego_xor = 0x61
 url_xor = 0xC5
 
+#Change the User-Agent to look less suspicius
+headers = {
+    'User-Agent': 'cruloader'
+}
+
 # RC4 key offset at 0xC
 key_offset = 12
 
@@ -39,30 +44,18 @@ get_urls = url_regexp.finditer(dexor)
 
 for matched_value in get_urls:
 	matched_url = (matched_value.group())
-
-#URL found in CruLoader sample
-url = matched_url
-
-#Change the User-Agent to look less suspicius
-headers = {
-    'User-Agent': 'cruloader'
-}
-
-r = requests.get(f'{url}', headers=headers)
-
-first_response = r.content.decode('utf-8')
-
-#Parse the data from the Pastebin webpage and send a new request
-new_url = first_response
-n = requests.get(f'{new_url}', headers=headers)
-payload = n.content
-
-# De-XOR payload
-payload = payload
-decrypted = malduck.xor(png_stego_key, payload)
-
-# Todo trim de-XOR:ed MZ file. For now I am piping the download payload througth "cut-bytes.py '[4D5A90]':" from Didier Stevens.
-
-# Write final stego .png payload to disk
-with open ("final_payload.bin", 'wb') as o:
-	o.write(decrypted)
+	#URL found in CruLoader sample
+	url = matched_url
+	r = requests.get(f'{url}', headers=headers)
+	first_response = r.content.decode('utf-8')
+	#Parse the data from the Pastebin webpage and send a new request
+	new_url = first_response
+	n = requests.get(f'{new_url}', headers=headers)
+	payload = n.content
+	# De-XOR payload
+	payload = payload
+	decrypted = malduck.xor(png_stego_xor, payload)
+	# Todo trim de-XOR:ed MZ file. For now I am piping the download payload througth "cut-bytes.py '[4D5A90]':" from Didier Stevens.
+	# Write final stego .png payload to disk
+	with open ("final_payload.bin", 'wb') as o:
+		o.write(decrypted)
