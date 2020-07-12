@@ -35,12 +35,15 @@ decrypted = malduck.rc4(rc4_key, encrypted)
 if decrypted[0:2].decode('latin1') != "MZ":
 	print("RC4 decryption failed")
 
+# Seems malduck ROL needs data type int according to the documentation
 else:
-	convert_rol = (decrypted)
-	# Seems malduck ROL needs data type int according to the documentation
+	convert_rol = (decrypted[0:])
 	for index,value in enumerate(convert_rol):
-	 a = malduck.rol(value, 4, bits=8)
-	 dexor = malduck.xor(url_xor, a)
+		a = malduck.rol(value, 4, bits=8)
+		#convert back to bytes for malduck.xor
+		b = bytes(chr(a), 'latin1')
+		dexor = malduck.xor(0xC5, b)
+#		print(dexor)
 
 # Iterate throught the data to find any regexp matches
 get_urls = url_regexp.finditer(dexor)
