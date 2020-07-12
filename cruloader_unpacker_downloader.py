@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # WHat? Who needs error handling?
-# Script does not work atm, until I figure out how to join those ints and then feed them do malduck.xor
+# Script does not work atm, until I figure out how to join those ints in the rol array and then feed them to malduck.xor as bytes
 
 import malduck
 import sys
@@ -32,13 +32,15 @@ rc4_key = get_rsrc[key_offset:key_offset+key_size]
 encrypted = get_rsrc[28:]
 decrypted = malduck.rc4(rc4_key, encrypted)
 
-convert_rol = (decrypted)
+if decrypted[0:2].decode('latin1') != "MZ":
+	print("RC4 decryption failed")
 
-# Seems malduck ROL needs data type int according to the documentation
-for index,value in enumerate(convert_rol):
+else:
+	convert_rol = (decrypted)
+	# Seems malduck ROL needs data type int according to the documentation
+	for index,value in enumerate(convert_rol):
 	 a = malduck.rol(value, 4, bits=8)
-	 
-dexor = malduck.xor(url_xor, a)
+	 dexor = malduck.xor(url_xor, a)
 
 # Iterate throught the data to find any regexp matches
 get_urls = url_regexp.finditer(dexor)
