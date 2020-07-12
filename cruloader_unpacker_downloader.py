@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # WHat? Who needs error handling?
+# Script does not work atm, until I figure out how to join those ints and then feed them do malduck.xor
 
 import malduck
 import sys
