@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-#Only works with Python2 atm. Will have to make it work with Python3 before adding it the logic to cruloader_unpacker_downloader.py
+#Only works with Python2 atm. Will have to make it work with Python3 before adding the code to cruloader_unpacker_downloader.py
 
 import sys
 import malduck
