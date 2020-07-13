@@ -1,4 +1,4 @@
-rule Zero_2_Hero_CruLoader
+rule Zero_2_Auto_CruLoader
 {
 	meta:
 	    author="daevlin"
