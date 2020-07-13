@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # WHat? Who needs error handling?
-# Script does not work atm, until I figure out how to join those ints in the rol array and then feed them to malduck.xor as bytes
 
 import malduck
 import sys
