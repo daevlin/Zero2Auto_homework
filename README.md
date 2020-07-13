@@ -12,11 +12,11 @@ Hides additional downloaded payloads in .PNG files, possibly to bypass FW/EDR/AV
 The final stage of the malicous code indicates the infected client has been "Uh Oh Hacked"
 I've attached at the following Yara rule to this email, that the IR team can use to find use on the infected client(s)
 
-rule Zero_2_Hero_CruLoader
+rule Zero_2_Auto_CruLoader
 {
 	meta:
 	    author="daevlin"
-	    description="Zero2hero CruLoader"
+	    description="Zero2Auto CruLoader"
 	    reference="https://courses.zero2auto.com/"
     strings:
         $cruloader_pdb = "Cruloader_Payload.pdb" wide ascii
