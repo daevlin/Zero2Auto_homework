@@ -9,7 +9,6 @@ infile = sys.argv[1]
 
 with open(infile,'rb') as f:
 	a = f.read()
-#.decode('latin1')
 
 c = 'redaolurc'	
 m = a.find(c)
