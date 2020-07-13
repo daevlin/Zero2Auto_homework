@@ -8,14 +8,15 @@ import malduck
 infile = sys.argv[1]
 
 with open(infile,'rb') as f:
-	a = f.read()
+	payload = f.read()
 
-c = 'redaolurc'	
-m = a.find(c)
-b = len('redaolurc')
+png_marker = 'redaolurc'	
+m = payload.find(png_marker)
+png_marker_len = len('redaolurc')
 
-trimmed_file = (a[m+b:])
+trimmed_file = (payload[m+png_marker_len:])
 dexor = malduck.xor(0x61, trimmed_file)
 
 with open('trimmed.bin', 'wb') as o:
 	o.write(dexor)
+	
