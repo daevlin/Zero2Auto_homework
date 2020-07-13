@@ -2,7 +2,7 @@ rule Zero_2_Hero_CruLoader
 {
 	meta:
 	    author="daevlin"
-	    description="Zero2hero CruLoader"
+	    description="Zero2Auto CruLoader"
 	    reference="https://courses.zero2auto.com/"
     strings:
         $cruloader_pdb = "Cruloader_Payload.pdb" wide ascii
