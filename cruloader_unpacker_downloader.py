@@ -62,8 +62,11 @@ for matched_value in get_urls:
 	payload = n.content
 	# De-XOR payload
 	payload = payload
-	decrypted = malduck.xor(png_stego_xor, payload)
-	# Todo trim de-XOR:ed MZ file. For now I am piping the download payload througth "cut-bytes.py '[4D5A90]':" from Didier Stevens.
+	png_marker = bytes('redaolurc','latin1')
+	m = payload.find(png_marker)
+	png_marker_len = len('redaolurc')
+	trimmed_file = (payload[m+png_marker_len:])
+	decrypted = malduck.xor(png_stego_xor, trimmed_file)
 	# Write final stego .png payload to disk
 	with open ("cruloader_final_payload.bin", 'wb') as o:
 		o.write(decrypted)
