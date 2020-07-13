@@ -17,6 +17,6 @@ png_marker_len = len('redaolurc')
 trimmed_file = (payload[m+png_marker_len:])
 dexor = malduck.xor(0x61, trimmed_file)
 
-with open('trimmed.bin', 'wb') as o:
+with open('cruloader_final_payload.bin', 'wb') as o:
 	o.write(dexor)
 	
