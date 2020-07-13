@@ -62,7 +62,7 @@ for matched_value in get_urls:
 	payload = n.content
 	# De-XOR payload
 	payload = payload
-	png_marker = bytes('redaolurc','latin1')
+	png_marker = bytes('redaolurc', 'latin1')
 	m = payload.find(png_marker)
 	png_marker_len = len('redaolurc')
 	trimmed_file = (payload[m+png_marker_len:])
