@@ -453,9 +453,9 @@ We can validate this by starting up HxD to check the key and the data after it
 
 Our RC4 key is at offset C (12 bytes in)
 
-With that knowledge, we should at least be able to make a Python script to unpack the first Stage of CruLoader.
+With that knowledge, we should at least be able to make a Python script to unpack the first Stage of CruLoader. But why settle for that?
 
-But we still wanna know what it does, since we can see in the decompiled code that there are a few other encrypted strings which have not been decrypted yet.
+We still wanna know what the additional functionality does, since we can see in the decompiled code that there are a few other encrypted strings which have not been decrypted yet.
 
 If the let the decryption routine finish on the newly allocted memory region we can see a decrypted MZ binary. 
 
@@ -683,7 +683,7 @@ dword ptr [ebp-C]=[0018F884]=BC6B67BF
 rahash2.exe -a crc32 -s "Process32NextW"
 0x00000000-0x0000000d crc32: bc6b67bf
 ```
-Whelps! What will it do with this information? Find a process to inject into? Be mean to us analysts and mess with us if a "forbidden" process is found?
+Whelps! What will it do with these API calls? Find a process to inject into? Be mean to us analysts and mess with us if a "forbidden" process is found?
 
 WTH? Sure enough, the process exited after it had gone through all the running processes. That's just evil. So how do we find out which process it is looking for?
 It looks like it uses the CRC32 function we saw before against any running processes.
@@ -713,7 +713,7 @@ This explains why it got injected into "svchost.exe"
 
 It creates a RemoteThread in the suspended svchost.exe process at address 00101DC0 in my case, where it will continue execution in the spawned child process
 
-In the spawned svchost it once again uses CRC32 hashing to resolve API calls from wininet.dll
+In the spawned svchost.exe process it once again uses CRC32 hashing to resolve API calls from wininet.dll
 
 ```
 InternetOpenA
@@ -746,7 +746,7 @@ Extract_URLs(false)
 On that page is the following data
 https://i.ibb.co/KsfqHym/PNG-02-Copy.png
 
-If we download that file, it is a .png file
+If we download that file, it is indeed a .png file that renders correctly when opened.
 
 Let's be sneaky and grab the .png file, then fire up Inetsim and let CruLoader grab first the link https://i.ibb.co/KsfqHym/PNG-02-Copy.png from https://pastebin.com/raw/mLem9DGk", which is our InetSim service. Hopefully makes it a bit easier to see if anything "fun" happens with that .png file.
 
@@ -766,7 +766,7 @@ The next string output.jpg is encrypted with
 rol cl,4  
 xor cl,1F
 ```
-Which is the filename, of the payload (in the PNG file) that will be written to disk
+Which is the filename, of the payload (the PNG file) that will be written to disk
 
 Once the .png file is downloaded it will once again call the CRC32 API hashing function and resolve:
 
@@ -777,24 +777,29 @@ CreateFileW
 WriteFile
 ```
 
-it will use these to create a directory in %TEMP%\\cruloader" with the file "output.jpg". This is our downloaded .png file.
+It will use these API calls to create a directory in %TEMP%\\cruloader" with the file "output.jpg". This is our downloaded .PNG file it writes to disk.
 
-THe string "redaolurc" is encrypted with:
+That it downloaded a .png file is not suspicius at all, right? Are not .png files just pictures? Well, this gets even more interesting.
+If we continue running the code, the string "redaolurc" shows up. What is it used for?
+
+The string "redaolurc" is encrypted with:
 ```
 rol cl,4
 xor cl,9A
 ```
 
-After that strings is deobfuscated it checks for the string "IHDR" in the memory region allocated for the downloaded .png file and the string "redaolurc"
+After that strings is deobfuscated it checks for the string "IHDR" in the memory region allocated for the downloaded .PNG file and the string "redaolurc"
 
 If we look at the data after the string "redaolurc" it seems to indicate that it's been XORED with 0x61 (the char "a")
 
 ![redaolurc](redaolurc_EOF.png)
 
-De-XORing the .png file with 0x61 reveals that it's a Windows binary. 
-We can trim the file by removing everything before the MZ header and then resize the file with PE-Bear.
+De-XORing the .png file with 0x61 reveals that it's a Windows binary and that the string "redaolurc" was used as a marker,
+for the malware to know the offset to the encrypted payload in the .PNG file.
 
-Continuing exectution, it spawns a new svchost.exe process in which it injects the decrypted .png file.
+We can trim the file by removing everything before the MZ header and then resize the it with PE-Bear, so that we can analyzer it later.
+
+Continuing exectution, it spawns a new svchost.exe process in which it injects the payload from the decrypted .png file.
 
 The final payload contains an interesting string in form of PDB path, which we could build a YARA rule for.
 "C":\Users\User\source\repos\Cruloader_Payload\Release\Cruloader_Payload.pdb"
