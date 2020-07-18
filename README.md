@@ -428,7 +428,7 @@ If the let the decryption routine finish on the newly allocted memory region we 
 
 ![decrypted_rsrc](decrypted_rsrc.png)
 
-After the .rsrc has been decrypted, it goes back to resoöving some more encrypted API calls. The calls are the following:
+After the .rsrc has been decrypted, it goes back to resolving some more obfuscated API calls. The calls are the following:
 ```
 00000001  SetThreadContext
 00000025  CreateProcessA
