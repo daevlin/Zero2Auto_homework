@@ -755,4 +755,4 @@ Functionality for the final payload is to display a Messagebox.
 **To automate parts of the extraction of the first packed layer and download of the .png payload I have created the following Python script:**
 (Note that I am quite the beginner at Python coding, so the code may not be the best)
 
-[CruLoader_Unpacker_Downloader](/assets/code/cruloader_unpacker_downloader.py)
+[CruLoader_Unpacker_Downloader](cruloader_unpacker_downloader.py)
