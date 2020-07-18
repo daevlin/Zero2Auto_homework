@@ -38,12 +38,7 @@ Browser User-Agent: cruloader
 
 ```
 
-
-
-
-
-
-### Detailed analysis of the custom sample from the chapter "Practical Analysis and Test
+### Detailed analysis of the custom malware sample
 
 Tools used: "rabin2, rahex2, Resource Hacker, DiE, Cutter, x32dbg, Python, Inetsim, PE-Bear"
 
@@ -52,7 +47,7 @@ We start by getting a hash of the file.
 Sample SHA256: 
 a0ac02a1e6c908b90173e86c3e321f2bab082ed45236503a21eb7d984de10611  main_bin.exe
 
-File seems to be compiled Sun Jun 21 16:12:38 2020. Seems to be no indication of time stomping.
+File is compiled Sun Jun 21 16:12:38 2020. There seems to be no indication of time stomping of the file.
 
 Looking at the hash on VT we can see that we get some hits
 
