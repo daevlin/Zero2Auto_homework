@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-# WHat? Who needs error handling?
+# What? Who needs error handling?
 
-import malduck
+from malduck import pe, xor, rc4, rol
 import sys
 import re
 import requests
@@ -11,7 +11,6 @@ infile = sys.argv[1]
 url_regexp = re.compile(r'http[s]?:\/\/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+')
 png_stego_xor = 0x61
 url_xor = 0xC5
-#test_url_for_regexp = "https://pastebin.com/raw/mLem9DGk"
 s = bytes('', 'latin1')
 #Change the User-Agent to look less suspicius
 headers = {
@@ -25,11 +24,11 @@ key_offset = 12
 key_size = 15
 
 # RC4 decrypt the first layer of CruLoader
-p = malduck.pe(open(infile, "rb").read(), fast_load=False)
-get_rsrc = p.resource(101)
+p = pe(open(infile, "rb").read(), fast_load=False)
+get_rsrc = p.resource('RT_RCDATA')
 rc4_key = get_rsrc[key_offset:key_offset+key_size]
 encrypted = get_rsrc[28:]
-decrypted = malduck.rc4(rc4_key, encrypted)
+decrypted = rc4(rc4_key, encrypted)
 
 if decrypted[0:2].decode('latin1') != "MZ":
 	print("RC4 decryption failed")
@@ -38,10 +37,10 @@ if decrypted[0:2].decode('latin1') != "MZ":
 else:
 	convert_rol = (decrypted[0:])
 	for index,value in enumerate(convert_rol):
-		a = malduck.rol(value, 4, bits=8)
+		a = rol(value, 4, bits=8)
 		#convert back to bytes for malduck.xor
 		b = bytes(chr(a), 'latin1')
-		dexor = malduck.xor(0xC5, b)
+		dexor = xor(0xC5, b)
 		s += dexor
 
 rolxor_data = (s.decode('latin-1'))
@@ -65,7 +64,7 @@ for matched_value in get_urls:
 	m = payload.find(png_marker)
 	png_marker_len = len('redaolurc')
 	trimmed_file = (payload[m+png_marker_len:])
-	decrypted = malduck.xor(png_stego_xor, trimmed_file)
+	decrypted = xor(png_stego_xor, trimmed_file)
 	# Write final stego .png payload to disk
 	with open ("cruloader_final_payload.bin", 'wb') as o:
 		o.write(decrypted)
