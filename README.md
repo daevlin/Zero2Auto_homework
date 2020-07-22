@@ -65,7 +65,7 @@ Detections:
 
 This may be is a indicator that the sample might be malicous.
 
-Looking at the imports with rabin2 -i main_bin.exe we can see that the sample import the following API calls:
+Looking at the imports with the command "rabin2 -i main_bin.exe" we can see that the sample import the following API calls:
 
 ```
 [Imports]
@@ -137,7 +137,7 @@ ordinal=065 plt=0x00000000 bind=NONE type=FUNC name=KERNEL32.dll_CreateFileW
 ordinal=066 plt=0x00000000 bind=NONE type=FUNC name=KERNEL32.dll_CloseHandle
 ordinal=067 plt=0x00000000 bind=NONE type=FUNC name=KERNEL32.dll_DecodePointer
 ```
-Looking at the sections of the binary with the following command "rabin2 -S main_bin.exe" 
+Looking at the sections of the binary with the following command "rabin2 -S main_bin.exe" show this:
 ```
 [Sections]
 idx=00 addr=0x00000400 off=0x00000400 sz=50688 vsz=50335 perm=-r-x name=.text
@@ -329,7 +329,7 @@ void __fastcall fcn.00401000(int32_t param_1)
     return;
     }
 ```
-Looking at this decompiled line of code "iVar6 = iVar3 + 0xd; (0xd = 13)", I have a sneaking suspicion that it is using ROT13 encoding.
+When looking at this decompiled line of code "iVar6 = iVar3 + 0xd; (0xd = 13)", I have a sneaking suspicion that it is using ROT13 encoding.
 But lets fire up x32dbg and put a BP 00401300, to further analyse it and verify this theory.
 
 Our encrypted strings:
@@ -371,8 +371,8 @@ VirtualAlloc
 LockResource
 LoadResource
 ```
-If we set BP on LockResource, and let it hit (and return to user code), the address of the resource that it wans to read should be in the EAX register.
-It will then call VirtualAlloc to assign a memory region for the resource.
+If we set BP on LockResource, and let it hit (and then return to user code), the address of the resource that it wants to access should be in the EAX register.
+It will then call VirtualAlloc to assign a memory region for the encrypted resource.
 After the memory region is allocated, we come across something that looks a lot like RC4 encryption (hint cmp eax, 100h):
 ```c
     iVar12 = 0;
@@ -446,7 +446,7 @@ It then calls the API function "CreateProcessA" to spawn a suspended copy of its
 So! With that let's move onto the next stage and look at the unpacked/decrypted payload I dumped out earlier, after it was decrypted, to see what this second stage does.
 
 Imports of our unpacked payload does not look that suspicous.
-rabin2.exe -i unpacked_cruloader.exe
+Output from the command "rabin2.exe -i unpacked_cruloader.exe":
 ```
 [Imports]
 Num  Vaddr       Bind      Type Name
@@ -523,7 +523,7 @@ Num  Vaddr       Bind      Type Name
 ```
 What about the sections? Nope, there is at least not another .rsrc section.
 
-rabin2.exe -S unpacked_cruloader.exe
+Output from the command "rabin2.exe -S unpacked_cruloader.exe":
 ```
 [Sections]
 Nm Paddr       Size Vaddr      Memsz Perms Name
