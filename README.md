@@ -689,7 +689,7 @@ Rotate_left(4,false)
 XOR({'option':'Hex','string':'C5'},'Standard',false)
 Extract_URLs(false)
 ```
-Sidenote: When we rotate the bits left 4 steps, we essantialy change DA to AD and so. We could say that the string is reversed. We can validate this with malduck:
+Sidenote: When we rotate the bits left 4 steps, we essentially change DA to AD. We could say that the string is reversed. We can validate this with malduck:
 
 ```
 data = malduck.unhex('ae8281fca8a089a8eab2a4b7eaa8aaa6ebabaca7a0b1b6a4b5eaeaffb6b5b1b1ad')
