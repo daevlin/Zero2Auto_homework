@@ -14,10 +14,10 @@ that can help the IR team to find client(s) infected with this malware.
 
 rule Zero_2_Auto_CruLoader
 {
-	meta:
-	    author="daevlin"
-	    description="Zero2Auto CruLoader"
-	    reference="https://courses.zero2auto.com/"
+    meta:
+        author="daevlin"
+        description="Zero2Auto CruLoader"
+        reference="https://courses.zero2auto.com/"
     strings:
         $cruloader_pdb = "Cruloader_Payload.pdb" wide ascii
         $cruloader_string = "cruloader" wide ascii
@@ -52,16 +52,16 @@ File is compiled Sun Jun 21 16:12:38 2020. There seems to be no indication of ti
 Looking at the hash on VT we can see that we get some hits when looking for the file hash:
 
 Scanned on : 
-	2020-06-21 14:15:51
+    2020-06-21 14:15:51
 
 Detections:
-	 24/72 Positives/Total
+     24/72 Positives/Total
 
-	Results for MD5    : a84e1256111e4e235250a8e3bb11f903
-	Results for SHA1   : 1b76e5a645a0df61bb4569d54bd1183ab451c95e
-	Results for SHA256 : a0ac02a1e6c908b90173e86c3e321f2bab082ed45236503a21eb7d984de10611
+    Results for MD5    : a84e1256111e4e235250a8e3bb11f903
+    Results for SHA1   : 1b76e5a645a0df61bb4569d54bd1183ab451c95e
+    Results for SHA256 : a0ac02a1e6c908b90173e86c3e321f2bab082ed45236503a21eb7d984de10611
 
-	Permanent Link : https://www.virustotal.com/gui/file/a0ac02a1e6c908b90173e86c3e321f2bab082ed45236503a21eb7d984de10611/detection/f-a0ac02a1e6c908b90173e86c3e321f2bab082ed45236503a21eb7d984de10611-1592748951
+    Permanent Link : https://www.virustotal.com/gui/file/a0ac02a1e6c908b90173e86c3e321f2bab082ed45236503a21eb7d984de10611/detection/f-a0ac02a1e6c908b90173e86c3e321f2bab082ed45236503a21eb7d984de10611-1592748951
 
 This may be is a indicator that the sample might be malicous.
 
@@ -738,3 +738,28 @@ WriteFile
 It will use these API calls to create a directory in %TEMP%\\cruloader" with the file "output.jpg". This is our downloaded .PNG file it writes to disk.
 That it downloaded a .png file is not suspicius at all, right? Are not .png files just pictures? Well, this gets even more interesting.
 If we continue running the code, the string "redaolurc" shows up. What is it used for?
+The string "redaolurc" is obfuscated with:
+```
+rol cl,4
+xor cl,9A
+```
+After that strings is deobfuscated it checks for the string "IHDR" in the memory region allocated for the downloaded .PNG file and the string "redaolurc"
+If we look at the data after the string "redaolurc" it seems to indicate that it contains data that has been XORed with 0x61 (the char "a")
+
+![redaolurc](redaolurc_EOF.png)
+
+De-XORing the .png file with 0x61 reveals that it's a Windows binary and that the string "redaolurc" was used as a marker,
+for the malware to know the offset to the encrypted payload in the .PNG file.
+We can trim the file by removing everything before the MZ header and then resize it with PE-Bear, so that we can analyze this final payload later.
+Continuing exectution, it spawns a new svchost.exe process in which it injects the payload from the decrypted .png file.
+The final payload contains an interesting string in form of PDB path, which we could build a YARA rule for.
+```
+"C":\Users\User\source\repos\Cruloader_Payload\Release\Cruloader_Payload.pdb"
+```
+The functionality for the final payload is to display a Messagebox:
+![Final_payload](final_payload_function.png)
+
+**To automate parts of the extraction of the first packed layer and download of the .png payload I have created the following Python script:**
+(Note that I am quite the beginner at Python coding, so the code may not be the best you've seen)
+
+[CruLoader_Unpacker_Downloader](cruloader_unpacker_downloader.py)
