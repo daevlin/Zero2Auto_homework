@@ -49,7 +49,7 @@ a0ac02a1e6c908b90173e86c3e321f2bab082ed45236503a21eb7d984de10611  main_bin.exe
 
 File is compiled Sun Jun 21 16:12:38 2020. There seems to be no indication of time stomping of the file.
 
-Looking at the hash on VT we can see that we get some hits
+Looking at the hash on VT we can see that we get some hits when looking for the file hash:
 
 Scanned on : 
 	2020-06-21 14:15:51
@@ -63,7 +63,7 @@ Detections:
 
 	Permanent Link : https://www.virustotal.com/gui/file/a0ac02a1e6c908b90173e86c3e321f2bab082ed45236503a21eb7d984de10611/detection/f-a0ac02a1e6c908b90173e86c3e321f2bab082ed45236503a21eb7d984de10611-1592748951
 
-Which is a indicator that the sample might be malicous.
+This may be is a indicator that the sample might be malicous.
 
 Looking at the imports with rabin2 -i main_bin.exe we can see that the sample import the following API calls:
 
@@ -153,7 +153,7 @@ FindResourceA
 LockResource
 LoadResource 
 ```
-DiE does not indicate that the sample is packed with a known packer. But hiding API calls and the big .rsrc makes me have a theory that it is. I just have to prove it somehow.
+DiE does not indicate that the sample is packed with a known packer. But hiding API calls and the big .rsrc section makes me have a theory that it is. I just have to prove it somehow.
 ```
 diec main_bin.exe 
 PE: compiler: Microsoft Visual C/C++(-)[-]
@@ -373,7 +373,7 @@ LoadResource
 ```
 If we set BP on LockResource, and let it hit (and return to user code), the address of the resource that it wans to read should be in the EAX register.
 It will then call VirtualAlloc to assign a memory region for the resource.
-After the memory region is allocated, we come across something that looks a lot like RC4 encryption (hint cmp eax, 100):
+After the memory region is allocated, we come across something that looks a lot like RC4 encryption (hint cmp eax, 100h):
 ```c
     iVar12 = 0;
     do {
@@ -404,16 +404,14 @@ After the memory region is allocated, we come across something that looks a lot 
         } while (iVar10 < iVar2);
     }
 ```
-EDI = size of encrypted data in hex 
-edi=00015400 (87040 bytes)
 
 If we look at this instruction in x32dbg we can see the RC4 key that will be used for decryption:
 ```
 00401592 | 0FB64438 0C              | movzx eax,byte ptr ds:[eax+edi+C]       | eax+edi*1+C:"kkd5YdPM24VBXmi"
 ```
-EAX = 0 (start of our rsrc section)
+EAX = 0
 EDI = .rsrc section at address 00416060 + C
-    
+Size of encrypted data in hex 0x00015400 (87040 bytes)   
 We can validate this by starting up HxD to check for the key and the data after it.
     
 ![HxD](resource_size.png)
@@ -422,13 +420,13 @@ Our RC4 key is at offset C (12 bytes in).
 
 With that knowledge, we should at least be able to make a Python script to unpack the first Stage of CruLoader. But why settle for that?
 
-We still wanna know what the additional functionality does, since we can see in the decompiled code that there are a few other encrypted strings which have not been decrypted yet.
+We still want to know what the additional functionality does, since we can see in the decompiled code that there are a few other encrypted strings which have not been decrypted yet.
 
-If the let the decryption routine finish on the newly allocted memory region we can see a decrypted MZ binary. 
+If the let the decryption routine finish on the newly allocted memory region we can see a decrypted MZ binary, so our assumption was correct.
 
 ![decrypted_rsrc](decrypted_rsrc.png)
 
-After the .rsrc has been decrypted, it goes back to resolving some more obfuscated API calls. The calls are the following:
+After the .rsrc has been decrypted, it goes back to resolving some more obfuscated API functions. They are the following:
 ```
 00000001  SetThreadContext
 00000025  CreateProcessA
@@ -439,15 +437,15 @@ After the .rsrc has been decrypted, it goes back to resolving some more obfuscat
 00000079  ReadProcessMemory
 0000008D  GetThreadContext
 ```
-It then calls this API to spawn a suspended copy of itself. This is starting to look like it will write the unpacked payload to a new child process.
+It then calls the API function "CreateProcessA" to spawn a suspended copy of itself. This is starting to look like it will write the unpacked payload to a new child process using the API calls that were just deobfuscated.
 
 ![Spawn_child](spawned_child.png)
 
 **Cruloaders second layer**
 
-So! With that let's move onto the next stage and look at the unpacked/decrypted payload we dumped out earlier to see what this second stage does.
+So! With that let's move onto the next stage and look at the unpacked/decrypted payload I dumped out earlier, after it was decrypted, to see what this second stage does.
 
-Imports of our unpacked payload does not look that suspicous
+Imports of our unpacked payload does not look that suspicous.
 rabin2.exe -i unpacked_cruloader.exe
 ```
 [Imports]
@@ -523,7 +521,7 @@ Num  Vaddr       Bind      Type Name
   69 0x0040f110    NONE    FUNC KERNEL32.dll_CreateFileW
   70 0x0040f114    NONE    FUNC KERNEL32.dll_DecodePointer
 ```
-What about the sections? Nope.
+What about the sections? Nope, there is at least not another .rsrc section.
 
 rabin2.exe -S unpacked_cruloader.exe
 ```
@@ -536,7 +534,7 @@ Nm Paddr       Size Vaddr      Memsz Perms Name
 ```
 
 DiE is not showing high entropy for any of the sections.
-Looking at the strings in the binary, shows something intersting though, a string "cruloader" and a dll for which there are no API imports. Does it perhaps contain network functionality since there is a reference to wininet.dll? But where is the hostname/URL?
+Looking at the strings in the binary, shows something intersting though, a string "cruloader" and a .dll for which there are no API imports. Does it perhaps contain network functionality since there is a reference to wininet.dll? But where is the hostname/URL?
 ```
 1062 0x00012a1c 0x00413c1c  12  13 (.rdata) ascii kernel32.dll
 1063 0x00012a2c 0x00413c2c   9  10 (.rdata) ascii ntdll.dll
@@ -647,13 +645,13 @@ Whelps! What will it do with these API calls? Find a process to inject into? Be 
 WTH? Sure enough, the process exited after it had gone through all the running processes. That's just evil. So how do we find out which process it is looking for?
 It looks like it uses the CRC32 function we saw before against any running processes.
 Killing ProcessHacker seems to do the trick. It also seems to check for Wireshark and possibly some other running process.
-Now that the bp for CreateProcessInternalW gets hit and a suspended svchost.exe process gets created.
+Now that I have stopped ProcessHacker and restarted the debugging of the second stage, the breakpoint for CreateProcessInternalW gets hit when we run it once again and a suspended svchost.exe process gets created.
 ```
 dword ptr ebp+C=0018F9F4 &"C:\\Windows\\System32\\svchost.exe"=0018FAA0 "C:\\Windows\\System32\\svchost.exe"
 ```
-After the BP is hit, we can start up ProcessHacker once again.
+After the BP is hit, ProcessHacker can be started again.
 Why did it inject into svchost.exe? There was no strings visible with that in the second stage binary.
-The reason is one of the string in the second stage is obfuscated with this:
+The reason is one of the string in the second stage is obfuscated with this function:
 ```
 rol dl,4
 xor dl,A2                               |
@@ -691,24 +689,38 @@ Rotate_left(4,false)
 XOR({'option':'Hex','string':'C5'},'Standard',false)
 Extract_URLs(false)
 ```
+Sidenote: When we rotate the bits left 4 steps, we essantialy change DA to AD and so. We could say that the string is reversed. We can validate this with malduck:
+
+```
+data = malduck.unhex('ae8281fca8a089a8eab2a4b7eaa8aaa6ebabaca7a0b1b6a4b5eaeaffb6b5b1b1ad')
+rol4 = data[::-1]
+
+malduck.enhex(rol4)
+Returns 'adb1b1b5b6ffeaeab5a4b6b1a0a7acabeba6aaa8eab7a4b2eaa889a0a8fc8182ae'
+
+malduck.xor(0xc5, data)
+'kGD9meLm/war/moc.nibetsap//:sptth'
+malduck.xor(0xc5, rol4)
+'https://pastebin.com/raw/mLem9DGk'
+
+```
 
 On the Pastebin page is the following data:
 https://i.ibb.co/KsfqHym/PNG-02-Copy.png
 
 If we download that file, it is indeed a .png file that renders correctly when opened.
 
-Let's be sneaky and grab the .png file, then fire up Inetsim and let CruLoader grab first the link https://i.ibb.co/KsfqHym/PNG-02-Copy.png from https://pastebin.com/raw/mLem9DGk", which is our InetSim service. Hopefully makes it a bit easier to see if anything "fun" happens with that .png file.
+Let's be sneaky and grab the .png file. We will then fire up Inetsim and let CruLoader grab the URL https://i.ibb.co/KsfqHym/PNG-02-Copy.png from the first link, https://pastebin.com/raw/mLem9DGk", which will be hosted on our InetSim service which is acting as a webserver and a DNS. Hopefully makes it a bit easier to see if anything "fun" happens with that .png file.
 For this to work, since it's calling /raw in pastebin we may have to remove all html tags from Inetsims sample.html and also change the URL to 
-http://i.ibb.co/KsfqHym/PNG-02-Copy.png. Reason being, is that InetSim is kinda bad at faking SSL certs. :)
+http://i.ibb.co/KsfqHym/PNG-02-Copy.png. I was also a bit sneaky and changed the pastebin URL in the sample to this,
+http://pastebin.com/index.html. Reason being, is that InetSim is kind of bad at faking SSL certs. :)
 
-The file PNG-02-Copy.png is copied into the InetSim folder, in my case:
+![Sneaky sneaky](sneaky_change_url.png)
+
+The file PNG-02-Copy.png is copied into the InetSim folder:
 ```
 cp PNG-02-Copy.png /var/lib/inetsim/http/fakefiles/sample.png
 ```
-I was also a bit cheeky and changed the pastebin URL in the sample to.
-http://pastebin.com/index.html 
-
-![Sneaky sneaky](sneaky_change_url.png)
 
 The next string output.jpg is obfuscated with
 ```
@@ -716,7 +728,7 @@ rol cl,4
 xor cl,1F
 ```
 Which is the filename, of the payload (the PNG file) that will be written to disk.
-Once the .png file is downloaded it will once again call the CRC32 API hashing function and resolve:
+When the .png file is downloaded it will once again call the CRC32 API hashing function and resolve:
 ```
 GetTempPathW
 CreateDirectoryW
@@ -726,28 +738,3 @@ WriteFile
 It will use these API calls to create a directory in %TEMP%\\cruloader" with the file "output.jpg". This is our downloaded .PNG file it writes to disk.
 That it downloaded a .png file is not suspicius at all, right? Are not .png files just pictures? Well, this gets even more interesting.
 If we continue running the code, the string "redaolurc" shows up. What is it used for?
-The string "redaolurc" is obfuscated with:
-```
-rol cl,4
-xor cl,9A
-```
-After that strings is deobfuscated it checks for the string "IHDR" in the memory region allocated for the downloaded .PNG file and the string "redaolurc"
-If we look at the data after the string "redaolurc" it seems to indicate that it contains data that has been XORed with 0x61 (the char "a")
-
-![redaolurc](redaolurc_EOF.png)
-
-De-XORing the .png file with 0x61 reveals that it's a Windows binary and that the string "redaolurc" was used as a marker,
-for the malware to know the offset to the encrypted payload in the .PNG file.
-We can trim the file by removing everything before the MZ header and then resize the it with PE-Bear, so that we can analyzer it later.
-Continuing exectution, it spawns a new svchost.exe process in which it injects the payload from the decrypted .png file.
-The final payload contains an interesting string in form of PDB path, which we could build a YARA rule for.
-```
-"C":\Users\User\source\repos\Cruloader_Payload\Release\Cruloader_Payload.pdb"
-```
-Functionality for the final payload is to display a Messagebox.
-![Final_payload](final_payload_function.png)
-
-**To automate parts of the extraction of the first packed layer and download of the .png payload I have created the following Python script:**
-(Note that I am quite the beginner at Python coding, so the code may not be the best)
-
-[CruLoader_Unpacker_Downloader](cruloader_unpacker_downloader.py)
