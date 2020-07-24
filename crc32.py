@@ -11,7 +11,7 @@ pe = pefile.PE(infile)
 def get_exports():
 	if hasattr(pe, 'DIRECTORY_ENTRY_EXPORT'):
 		for exp in pe.DIRECTORY_ENTRY_EXPORT.symbols:
-			 if (exp.name is not None):
+			 if exp.name is not None:
 				 crc32 = str(hex(zlib.crc32(exp.name)))
 				 export = str(exp.name, 'utf-8')
 				 print(export + ' = ' + crc32)
