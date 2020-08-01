@@ -1,5 +1,4 @@
-#!/usr/bin/env python3
-# What? Who needs error handling?
+#!/usr/bin/env python3 
 
 from malduck import pe, xor, rc4, rol
 import sys
@@ -29,9 +28,10 @@ get_rsrc = p.resource('RT_RCDATA')
 rc4_key = get_rsrc[key_offset:key_offset+key_size]
 encrypted = get_rsrc[28:]
 decrypted = rc4(rc4_key, encrypted)
+print("[+] Second layer unpacked")
 
 if decrypted[0:2].decode('latin1') != "MZ":
-	print("RC4 decryption failed")
+	print("[-] RC4 decryption failed")
 
 # Seems malduck ROL needs data type int according to the documentation
 else:
@@ -52,10 +52,12 @@ for matched_value in get_urls:
 	matched_url = (matched_value.group())
 	#URL found in CruLoader sample
 	url = matched_url
+	print("[+] Found URL in file: " + url) 
 	r = requests.get(f'{url}', headers=headers)
 	first_response = r.content.decode('utf-8')
 	#Parse the data from the Pastebin webpage and send a new request
 	new_url = first_response
+	print("[+] Making a new HTTP request to the parsed URL: " + new_url) 
 	n = requests.get(f'{new_url}', headers=headers)
 	payload = n.content
 	# De-XOR payload
@@ -68,3 +70,4 @@ for matched_value in get_urls:
 	# Write final stego .png payload to disk
 	with open ("cruloader_final_payload.bin", 'wb') as o:
 		o.write(decrypted)
+		print("[+] Wrote final payload to disk")
